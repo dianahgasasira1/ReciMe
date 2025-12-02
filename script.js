@@ -1,4 +1,4 @@
-import { API_KEY } from "./.env";
+import { API_KEY } from "/.env";
 
 const input = document.getElementById("query");
 const statusText = document.getElementById("status");
