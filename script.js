@@ -1,9 +1,11 @@
-import { API_KEY } from "/.env";
+require('dotenv').config();
+const apiKey = process.env.API_SECRET_KEY;
 
 const input = document.getElementById("query");
 const statusText = document.getElementById("status");
 const list = document.getElementById('list');
 const addbtn = document.getElementById('addbtn');
+const results = document.getElementById('results');
 
 window.addEventListener('load', () => {
     const Savedreci = JSON.parse(localStorage.getItem('recipes')) || [];
@@ -15,11 +17,34 @@ window.addEventListener('load', () => {
 addbtn.addEventListener('click', addrecipe);
 
  async function searchRecipes(query) {
-    const url = `https://api.spoonacular.com/recipes/complexSearch?query=${query}&apiKey=${API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    console.log(data);
-    return data;
+    try {
+        const url = `https://api.spoonacular.com/recipes/complexSearch?query=${query}&apiKey=${apiKey}`;
+        const res = await fetch(url);
+
+        if(!res.ok){
+            throw new Error(`Failed to fetch API: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log(data);
+
+        if(data.results && data.results.length > 0){
+            displayResults(data.results);
+            statusText.textContent = `Yay! Found ${data.results.length} recipes.`;
+        }
+        else{
+            statusText.textContent = "No recipes found!"
+        }
+
+        return data;
+    }
+
+    catch (err) {
+        console.error("Error:", err);
+        statusText.textContent = "CHECK THE API ISSUE";
+        results.innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
+    }
+    
 } 
 
 function addrecipe(){
@@ -77,6 +102,18 @@ function removeFromLocalStorage(recipes) {
     const updated = Savedreci.filter(item => item !== recipes);
     localStorage.setItem('recipes', JSON.stringify(updated));
 }
+
+function displayResults(recipe){
+    results.innerHTML = '<h3>Recipe Results:</h3>';
+    const reciCard = document.createElement('div');
+        reciCard.className = 'recipe-card';
+        reciCard.innerHTML = `
+            <h4>${recipe.title}</h4>
+            <img src="${recipe.image}" alt="${recipe.title}">
+        `;
+        results.appendChild(reciCard);
+    };
+
 
 
 
