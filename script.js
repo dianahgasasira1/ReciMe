@@ -1,5 +1,4 @@
-require('dotenv').config();
-const apiKey = process.env.API_SECRET_KEY;
+import {API_SECRET_KEY} from "./config.js";
 
 const input = document.getElementById("query");
 const statusText = document.getElementById("status");
@@ -18,7 +17,7 @@ addbtn.addEventListener('click', addrecipe);
 
  async function searchRecipes(query) {
     try {
-        const url = `https://api.spoonacular.com/recipes/complexSearch?query=${query}&apiKey=${apiKey}`;
+        const url = `https://api.spoonacular.com/recipes/complexSearch?query=${query}&apiKey=${API_SECRET_KEY}`;
         const res = await fetch(url);
 
         if(!res.ok){
@@ -105,6 +104,11 @@ function removeFromLocalStorage(recipes) {
 
 function displayResults(recipe){
     results.innerHTML = '<h3>Recipe Results:</h3>';
+
+    recipe.forEach(recipe => {
+        if(!recipe)
+            return
+
     const reciCard = document.createElement('div');
         reciCard.className = 'recipe-card';
         reciCard.innerHTML = `
@@ -112,8 +116,9 @@ function displayResults(recipe){
             <img src="${recipe.image}" alt="${recipe.title}">
         `;
         results.appendChild(reciCard);
+        })
     };
-
+    
 
 
 
